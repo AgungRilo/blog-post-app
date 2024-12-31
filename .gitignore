@@ -1,0 +1,40 @@
+# Node modules
+node_modules/
+
+# Logs
+*.log
+logs/
+logs/*.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build output
+.next/
+out/
+dist/
+build/
+
+# Operating system files
+.DS_Store
+*.swp
+Thumbs.db
+
+# Editor and IDE files
+.vscode/
+.idea/
+
+# Testing artifacts
+coverage/
+cypress/screenshots/
+cypress/videos/
+playwright-report/
+
+# CI/CD
+.github/workflows/*.log
+
+# Temporary files
+*.tmp
+*.temp
