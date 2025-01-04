@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTheme } from '@/components/themeProvider';
-import {  DynamicButton, DynamicSwitch } from './dynamic';
+import {  DynamicSwitch } from './dynamic';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 import { logout } from '@/store/slices/authSlice'; 
