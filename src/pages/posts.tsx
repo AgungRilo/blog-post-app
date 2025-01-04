@@ -20,7 +20,6 @@ function Posts() {
     body: string;
   }
 
-  const { isDarkMode } = useTheme();
   const [apiToken, setApiToken] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -135,7 +134,7 @@ function Posts() {
     {
       title: 'Actions',
       key: 'actions',
-      render: (_: any, record: Post) => (
+      render: (record: Post) => (
         <div style={{ display: 'flex', gap: '10px' }}>
           <Tooltip title="View Details">
             <EyeOutlined
