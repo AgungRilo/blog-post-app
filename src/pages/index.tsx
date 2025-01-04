@@ -10,7 +10,6 @@ export default function Home() {
   const [apiToken, setApiToken] = useState<string | null>(null); // API token state
   const [userName, setUserName] = useState<string>(''); // User name state
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false); // Modal visibility
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false); // Dark mode toggle
   const [isValidating, setIsValidating] = useState<boolean>(false); // Loading state for validation
   const [isInitializing, setIsInitializing] = useState<boolean>(true); // State to indicate initialization
   const router = useRouter();
@@ -34,7 +33,6 @@ export default function Home() {
       setIsModalVisible(true);
     }
 
-    setIsDarkMode(savedTheme);
     setIsInitializing(false); // Mark initialization complete
   }, [dispatch]);
 
@@ -79,15 +77,6 @@ export default function Home() {
     } else {
       alert('Please provide a valid name and API token!');
     }
-  };
-
-  // Handle dark mode toggle
-  const toggleDarkMode = () => {
-    setIsDarkMode((prev) => {
-      const newMode = !prev;
-      localStorage.setItem('theme', newMode ? 'dark' : 'light'); // Save preference to localStorage
-      return newMode;
-    });
   };
 
   // Show loading spinner during initialization

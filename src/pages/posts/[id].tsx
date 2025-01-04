@@ -23,7 +23,6 @@ const PostDetail = () => {
   const { id, result } = router.query;
   const [userName, setUserName] = useState<string | null>("");
   const dataDetail = useSelector((state: RootState) => state.detail.data);
-  const [postData, setPostData] = useState<PostDetail | null>(null);
 
   useEffect(() => {
     const savedName = localStorage.getItem('userName');
@@ -36,16 +35,7 @@ const PostDetail = () => {
     return response.data;
   };
 
-  useEffect(() => {
-    const { id, result } = router.query;
-    if (result) {
-      try {
-        const parsedResult = JSON.parse(result as string);
-        setPostData(parsedResult);
-      } catch (error) {
-      }
-    }
-  }, [result]);
+ 
   // Gunakan useQuery dengan bentuk objek
   const { data, isLoading, isError } = useQuery<PostDetail>({
     queryKey: ['postDetail', id],

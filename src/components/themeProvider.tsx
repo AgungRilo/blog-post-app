@@ -1,5 +1,5 @@
 import React, { useState, createContext, useContext, ReactNode } from 'react';
-import { ConfigProvider, Button } from 'antd';
+import { ConfigProvider } from 'antd';
 
 // Context untuk mengelola tema
 const ThemeContext = createContext({
