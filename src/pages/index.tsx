@@ -54,8 +54,11 @@ export default function Home() {
       setIsValidating(false);
       return response.status === 200; // Token valid if API call is successful
     } catch (error) {
+      if(error instanceof Error){
+        alert(error.message);
+      }
       setIsValidating(false);
-      return error; // Token invalid
+      return false; // Token invalid
     }
   };
 
@@ -63,7 +66,6 @@ export default function Home() {
   const handleSave = async () => {
     if (apiToken && userName) {
       const isTokenValid = await validateToken(apiToken);
-
       if (isTokenValid) {
         dispatch(login());
         localStorage.setItem('apiToken', apiToken); // Save token to localStorage
