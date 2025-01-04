@@ -62,12 +62,8 @@ function Posts() {
 
     const totalPages = parseInt(response.headers['x-pagination-pages'], 10) || 0;
     setTotalPages(totalPages);
-    return response.data.map((post: any) => ({
-      ...post,
-      user_id: Number(post.user_id), // Konversi user_id menjadi number
-    }));
   
-    // return response.data;
+    return response.data;
   };
 
   const deletePost = async (id: number): Promise<void> => {
