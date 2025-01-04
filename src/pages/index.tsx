@@ -1,4 +1,4 @@
-import { DynamicModal, DynamicInput, DynamicButton } from '@/components/dynamic';
+import { DynamicModal, DynamicInput, DynamicButton, DynamicSpin } from '@/components/dynamic';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ export default function Home() {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false); // Modal visibility
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false); // Dark mode toggle
   const [isValidating, setIsValidating] = useState<boolean>(false); // Loading state for validation
+  const [isInitializing, setIsInitializing] = useState<boolean>(true); // State to indicate initialization
   const router = useRouter();
 
   const dispatch = useDispatch();
@@ -19,31 +20,30 @@ export default function Home() {
     (state: RootState) => state.auth.isAuthenticated
   );
 
-  // Redirect jika sudah login
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/posts'); // Redirect ke list jika sudah login
-    }
-  }, [isAuthenticated, router]);
-
-  // Check localStorage for saved token and user name
+  // Initialize the app state
   useEffect(() => {
     const savedToken = localStorage.getItem('apiToken');
     const savedName = localStorage.getItem('userName');
     const savedTheme = localStorage.getItem('theme') === 'dark';
 
-    if (savedToken) {
+    if (savedToken && savedName) {
       setApiToken(savedToken);
-    } else {
-      setIsModalVisible(true); // Show dialog if token is not available
-    }
-
-    if (savedName) {
       setUserName(savedName);
+      dispatch(login());
+    } else {
+      setIsModalVisible(true);
     }
 
-    setIsDarkMode(savedTheme); // Load dark mode preference
-  }, []);
+    setIsDarkMode(savedTheme);
+    setIsInitializing(false); // Mark initialization complete
+  }, [dispatch]);
+
+  // Redirect jika sudah login
+  useEffect(() => {
+    if (!isInitializing && isAuthenticated) {
+      router.replace('/posts'); // Redirect ke list jika sudah login
+    }
+  }, [isAuthenticated, isInitializing, router]);
 
   // Validate token with GoRest API
   const validateToken = async (token: string) => {
@@ -54,7 +54,6 @@ export default function Home() {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("response", response);
       setIsValidating(false);
       return response.status === 200; // Token valid if API call is successful
     } catch (error) {
@@ -73,7 +72,7 @@ export default function Home() {
         localStorage.setItem('apiToken', apiToken); // Save token to localStorage
         localStorage.setItem('userName', userName); // Save user name to localStorage
         setIsModalVisible(false); // Close dialog
-        router.push('/posts'); // Navigate to list page
+        router.replace('/posts'); // Navigate to list page
       } else {
         alert('Invalid API token! Please provide a valid token.');
       }
@@ -90,6 +89,11 @@ export default function Home() {
       return newMode;
     });
   };
+
+  // Show loading spinner during initialization
+  if (isInitializing) {
+    return <DynamicSpin size="large" />;
+  }
 
   return (
     <div className="p-4">

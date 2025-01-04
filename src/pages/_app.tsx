@@ -30,7 +30,6 @@ export default function App({ Component, pageProps }: any) {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("response", response);
       setIsValidating(false);
       return response.status === 200; // Token valid if API call is successful
     } catch (error) {

@@ -30,6 +30,18 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
             //     controlItemBgActiveHover: isDarkMode ? '#3a3a3a' : '#40a9ff', // Latar belakang item aktif saat hover
             //     controlItemBgHover: isDarkMode ? '#2a2a2a' : '#e6f7ff', // Latar belakang item saat hover
             //   },
+            Input: {
+                colorTextPlaceholder: isDarkMode ? '#888888' : '#bfbfbf', 
+                colorBgContainer: isDarkMode ? '#1f1f1f' : '#fff',
+                colorText: isDarkMode ? '#fff' : '#000',
+                colorBorder: isDarkMode ? '#434343' : '#d9d9d9',
+              },
+
+              Switch: {
+                colorPrimary: isDarkMode ? '#40a9ff' : '#1890ff', // Warna tombol aktif
+                colorBgContainer: isDarkMode ? '#1f1f1f' : '#ffffff', // Warna latar belakang
+                controlOutline: isDarkMode ? '#434343' : '#d9d9d9', // Outline
+              },
               
             },
            
@@ -45,7 +57,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
             backgroundColor: isDarkMode ? '#000' : '#fff',
             color: isDarkMode ? '#fff' : '#000',
             minHeight: '100vh',
-            padding: '20px',
+            padding: '40px',
           }}
         >
           {children}

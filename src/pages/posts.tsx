@@ -9,28 +9,29 @@ import { ColumnType } from 'antd/es/table';
 import { useTheme } from '@/components/themeProvider';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { Modal, Tooltip } from 'antd';
-
+import { useDispatch } from 'react-redux';
+import { setData } from '@/store/slices/detailSlice';
 function Posts() {
   interface Post {
     id: number;
+    user_id: string;
     title: string;
     body: string;
   }
   const { isDarkMode } = useTheme();
-
   const [apiToken, setApiToken] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1); // Halaman aktif
-  const [totalPages, setTotalPages] = useState<number>(0); // Total halaman
-  const [searchQuery, setSearchQuery] = useState<string>(''); // Query pencarian
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>(''); // Query dengan debounce
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false); // State modal
-  const [postToDelete, setPostToDelete] = useState<number | null>(null); // Post ID untuk delete
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>('');
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<number | null>(null);
   const queryClient = useQueryClient();
   const router = useRouter();
-  // Ambil token dan userName dari localStorage
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    console.log("token: ", localStorage.getItem('apiToken'))
     const savedName = localStorage.getItem('userName');
     const token = localStorage.getItem('apiToken');
     setUserName(savedName);
@@ -44,7 +45,7 @@ function Posts() {
     }, 300);
 
     return () => {
-      clearTimeout(handler); // Bersihkan timeout jika pengguna mengetik lagi sebelum 300ms
+      clearTimeout(handler);
     };
   }, [searchQuery]);
 
@@ -90,8 +91,18 @@ function Posts() {
     },
   });
 
-  const goToDetail = (id: number) => {
+  const goToDetail = (id: number, data: any) => {
     router.push(`/posts/${id}`);
+    dispatch(setData(data));
+  };
+
+  const goToEdit = (id: number, dataEdit: any) => {
+    router.push(`/posts/edit/${id}`);
+    dispatch(setData(dataEdit));
+  };
+
+  const goToAdd = () => {
+    router.push(`/posts/add`);
   };
 
   const handleDelete = () => {
@@ -124,7 +135,7 @@ function Posts() {
                 color: '#1890ff',
                 cursor: 'pointer',
               }}
-              onClick={() => goToDetail(record.id)}
+              onClick={() => goToDetail(record.id, record)}
               onMouseEnter={(e) => {
                 (e.target as HTMLElement).style.color = '#40a9ff';
               }}
@@ -141,7 +152,7 @@ function Posts() {
                 color: '#faad14',
                 cursor: 'pointer',
               }}
-              // onClick={() => goToEdit(record.id)} // Tambahkan fungsi goToEdit
+              onClick={() => goToEdit(record.id, record)} // Tambahkan fungsi goToEdit
               onMouseEnter={(e) => {
                 (e.target as HTMLElement).style.color = '#ffc069';
               }}
@@ -177,43 +188,28 @@ function Posts() {
   ];
 
   return (
-    <div className='m-20'
-    >
+    <div>
       <div>
         <Header userName={userName} />
         <div className='flex justify-between'>
 
-        <DynamicInput
-          placeholder='search post'
-          className='w-40 mb-4'
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          <DynamicInput
+            placeholder='search post'
+            className='w-40 mb-4'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
-        <DynamicButton
-          type="primary"
-          // onClick={() => (1)}
-          className="mb-4"
+          <DynamicButton
+            type="primary"
+            // onClick={() => (1)}
+            onClick={goToAdd}
+            className="mb-4"
           >Add Posts</DynamicButton>
-          </div>
+        </div>
       </div>
       {isLoading ?
         <DynamicSpin size="large" />
         :
-        // <DynamicTable
-        //   dataSource={(data || []) as Post[]}
-        //   columns={columns}
-        //   pagination={{
-        //     current: currentPage,
-        //     pageSize: 20,
-        //     total: totalPages,
-        //     style: {
-        //       backgroundColor: isDarkMode ? '#1f1f1f' : '#ffffff', // Pagination background
-        //       color: isDarkMode ? '#ffffff' : '#000000', // Pagination text
-        //     },
-        //     onChange: (page) => setCurrentPage(page),
-        //   }}
-        //   rowKey="id"
-        // />
         <DynamicTable
           dataSource={(data || []) as Post[]}
           columns={columns}
@@ -258,8 +254,6 @@ function Posts() {
             color: isDarkMode ? '#ffffff' : '#000000', // Table text color
           }}
         />
-
-
       }
       <Modal
         title="Confirm Delete"
