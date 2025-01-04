@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { DynamicTable, DynamicButton, DynamicInput, DynamicSpin } from '@/components/dynamic';
+import { DynamicButton, DynamicInput, DynamicSpin } from '@/components/dynamic';
 import withAuth from '@/components/protectedRoute';
 import Header from '@/components/header';
 import axios from 'axios';
