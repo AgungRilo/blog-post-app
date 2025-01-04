@@ -10,14 +10,10 @@ import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { Modal, Tooltip } from 'antd';
 import { useDispatch } from 'react-redux';
 import { setData } from '@/store/slices/detailSlice';
+import { Post } from '@/components/interface';
 
 function Posts() {
-  interface Post {
-    id: number;
-    user_id: string;
-    title: string;
-    body: string;
-  }
+  
 
   const [apiToken, setApiToken] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
@@ -66,7 +62,12 @@ function Posts() {
 
     const totalPages = parseInt(response.headers['x-pagination-pages'], 10) || 0;
     setTotalPages(totalPages);
-    return response.data;
+    return response.data.map((post: any) => ({
+      ...post,
+      user_id: Number(post.user_id), // Konversi user_id menjadi number
+    }));
+  
+    // return response.data;
   };
 
   const deletePost = async (id: number): Promise<void> => {

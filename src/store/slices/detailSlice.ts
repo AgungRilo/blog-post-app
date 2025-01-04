@@ -1,12 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-// Definisikan tipe Post sesuai kebutuhan Anda
-interface Post {
-    id: number;
-    user_id: number;
-    title: string;
-    body: string;
-}
+import { Post } from '@/components/interface';
 
 interface DataState {
     data: Post | null; // Gunakan tipe Post atau null jika default kosong
