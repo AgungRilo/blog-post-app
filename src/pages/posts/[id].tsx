@@ -20,7 +20,7 @@ interface PostDetail {
 
 const PostDetail = () => {
   const router = useRouter();
-  const { id, result } = router.query;
+  const { id } = router.query;
   const [userName, setUserName] = useState<string | null>("");
   const dataDetail = useSelector((state: RootState) => state.detail.data);
 
@@ -37,7 +37,7 @@ const PostDetail = () => {
 
  
   // Gunakan useQuery dengan bentuk objek
-  const { data, isLoading, isError } = useQuery<PostDetail>({
+  const { data, isLoading } = useQuery<PostDetail>({
     queryKey: ['postDetail', id],
     queryFn: fetchPostDetail,
     enabled: !!id, // Fetch hanya jika `id` ada

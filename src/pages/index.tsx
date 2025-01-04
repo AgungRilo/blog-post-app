@@ -23,7 +23,6 @@ export default function Home() {
   useEffect(() => {
     const savedToken = localStorage.getItem('apiToken');
     const savedName = localStorage.getItem('userName');
-    const savedTheme = localStorage.getItem('theme') === 'dark';
 
     if (savedToken && savedName) {
       setApiToken(savedToken);
