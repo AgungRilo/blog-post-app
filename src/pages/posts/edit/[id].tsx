@@ -2,7 +2,7 @@ import BackToList from '@/components/backToList';
 import Header from '@/components/header';
 import React, { useEffect, useState } from 'react';
 import CardCustom from '@/components/card';
-import { Form, Button, Modal, Input } from 'antd';
+import { Form, Input } from 'antd';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { DynamicModal, DynamicButton, DynamicSpin } from '@/components/dynamic';
@@ -19,7 +19,6 @@ const EditPost = () => {
   const router = useRouter();
   const { id } = router.query;
   const dataDetail = useSelector((state: RootState) => state.detail.data);
-  const [postData, setPostData] = useState<PostDetail | null>(null);
 
   useEffect(() => {
     const savedName = localStorage.getItem('userName');
@@ -35,7 +34,7 @@ const EditPost = () => {
   };
 
 
-  const { data, isLoading, isError } = useQuery<PostDetail>({
+  const { data, isLoading } = useQuery<PostDetail>({
     queryKey: ['postDetail', id],
     queryFn: fetchPostDetail,
     enabled: !!id, // Fetch hanya jika `id` ada
@@ -61,7 +60,16 @@ const EditPost = () => {
         setIsModalVisible(true);
       }
     } catch (error) {
-      alert('Failed to update post. Please try again.');
+      if (axios.isAxiosError(error)) {
+        // Axios-specific error
+        alert(error.response?.data?.message || 'An error occurred');
+      } else if (error instanceof Error) {
+        // Generic JS error
+        alert(error.message);
+      } else {
+        // Unknown error
+        alert('An unexpected error occurred.');
+      }
     } finally {
       setIsSubmitting(false);
     }

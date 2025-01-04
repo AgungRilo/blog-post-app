@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { DynamicTable, DynamicButton, DynamicInput, DynamicSpin } from '@/components/dynamic';
-import withAuth from '@/components/protectedRoute'; // HOC untuk proteksi rute
+import withAuth from '@/components/protectedRoute';
 import Header from '@/components/header';
 import axios from 'axios';
 import { useRouter } from 'next/router';
@@ -11,6 +11,7 @@ import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { Modal, Tooltip } from 'antd';
 import { useDispatch } from 'react-redux';
 import { setData } from '@/store/slices/detailSlice';
+
 function Posts() {
   interface Post {
     id: number;
@@ -18,6 +19,7 @@ function Posts() {
     title: string;
     body: string;
   }
+
   const { isDarkMode } = useTheme();
   const [apiToken, setApiToken] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
@@ -50,7 +52,11 @@ function Posts() {
   }, [searchQuery]);
 
   // Fetch posts dari API
-  const fetchPosts = async () => {
+  const fetchPosts = async (): Promise<Post[]> => {
+    if (!apiToken) {
+      throw new Error('API token not available');
+    }
+
     const response = await axios.get(
       `https://gorest.co.in/public/v2/posts?page=${currentPage}&title=${debouncedSearchQuery}`,
       {
@@ -61,12 +67,15 @@ function Posts() {
     );
 
     const totalPages = parseInt(response.headers['x-pagination-pages'], 10) || 0;
-
-    setTotalPages(totalPages); // Simpan total halaman
-    return response.data; // Data yang digunakan untuk tabel
+    setTotalPages(totalPages);
+    return response.data;
   };
 
   const deletePost = async (id: number): Promise<void> => {
+    if (!apiToken) {
+      throw new Error('API token not available');
+    }
+
     await axios.delete(`https://gorest.co.in/public/v2/posts/${id}`, {
       headers: {
         Authorization: `Bearer ${apiToken}`,
@@ -74,31 +83,28 @@ function Posts() {
     });
   };
 
-
-
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['posts', currentPage, debouncedSearchQuery], // Tambahkan currentPage ke queryKey
-    queryFn: fetchPosts, // Fungsi fetch data
-    enabled: !!apiToken, // Fetch hanya jika token tersedia
-    // keepPreviousData: true, // Simpan data lama saat berganti halaman
+  const { data, isLoading, isError } = useQuery<Post[]>({
+    queryKey: ['posts', currentPage, debouncedSearchQuery],
+    queryFn: fetchPosts,
+    enabled: !!apiToken,
   });
 
   const mutation = useMutation<void, Error, number>({
     mutationFn: deletePost,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] }); // Refetch data setelah berhasil hapus
-      setDeleteModalVisible(false); // Tutup modal
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      setDeleteModalVisible(false);
     },
   });
 
-  const goToDetail = (id: number, data: any) => {
-    router.push(`/posts/${id}`);
+  const goToDetail = (id: number, data: Post) => {
     dispatch(setData(data));
+    router.push(`/posts/${id}`);
   };
 
-  const goToEdit = (id: number, dataEdit: any) => {
-    router.push(`/posts/edit/${id}`);
+  const goToEdit = (id: number, dataEdit: Post) => {
     dispatch(setData(dataEdit));
+    router.push(`/posts/edit/${id}`);
   };
 
   const goToAdd = () => {
@@ -111,7 +117,10 @@ function Posts() {
     }
   };
 
-  if (isError) return <p>Error loading posts. Check your API token.</p>;
+  if (isError) {
+    return <p>Error loading posts. Check your API token.</p>;
+  }
+
   const columns: ColumnType<Post>[] = [
     {
       title: 'Title',
@@ -136,12 +145,6 @@ function Posts() {
                 cursor: 'pointer',
               }}
               onClick={() => goToDetail(record.id, record)}
-              onMouseEnter={(e) => {
-                (e.target as HTMLElement).style.color = '#40a9ff';
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLElement).style.color = '#1890ff';
-              }}
             />
           </Tooltip>
 
@@ -152,13 +155,7 @@ function Posts() {
                 color: '#faad14',
                 cursor: 'pointer',
               }}
-              onClick={() => goToEdit(record.id, record)} // Tambahkan fungsi goToEdit
-              onMouseEnter={(e) => {
-                (e.target as HTMLElement).style.color = '#ffc069';
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLElement).style.color = '#faad14';
-              }}
+              onClick={() => goToEdit(record.id, record)}
             />
           </Tooltip>
 
@@ -171,14 +168,7 @@ function Posts() {
               }}
               onClick={() => {
                 setDeleteModalVisible(true);
-                setPostToDelete(record.id); // Set ID post yang akan dihapus
-              }}
-
-              onMouseEnter={(e) => {
-                (e.target as HTMLElement).style.color = '#ff7875';
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLElement).style.color = '#ff4d4f';
+                setPostToDelete(record.id);
               }}
             />
           </Tooltip>
@@ -189,80 +179,41 @@ function Posts() {
 
   return (
     <div>
-      <div>
-        <Header userName={userName} />
-        <div className='flex justify-between'>
-
-          <DynamicInput
-            placeholder='search post'
-            className='w-40 mb-4'
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <DynamicButton
-            type="primary"
-            // onClick={() => (1)}
-            onClick={goToAdd}
-            className="mb-4"
-          >Add Posts</DynamicButton>
-        </div>
+      <Header userName={userName} />
+      <div className="flex justify-between">
+        <DynamicInput
+          placeholder="Search post"
+          className="w-40 mb-4"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <DynamicButton type="primary" onClick={goToAdd} className="mb-4">
+          Add Posts
+        </DynamicButton>
       </div>
-      {isLoading ?
+      {isLoading ? (
         <DynamicSpin size="large" />
-        :
+      ) : (
         <DynamicTable
-          dataSource={(data || []) as Post[]}
+          dataSource={data || []}
           columns={columns}
           pagination={{
             current: currentPage,
             pageSize: 20,
             total: totalPages,
             onChange: (page) => setCurrentPage(page),
-            style: {
-              backgroundColor: isDarkMode ? '#1f1f1f' : '#ffffff', // Pagination background
-              color: isDarkMode ? '#ffffff' : '#000000', // Pagination text
-            },
-            itemRender: (page, type, originalElement) => {
-              if (type === 'prev') {
-                return (
-                  <a
-                    style={{
-                      color: isDarkMode ? '#ffffff' : '#000000',
-                    }}
-                  >
-                    Previous
-                  </a>
-                );
-              }
-              if (type === 'next') {
-                return (
-                  <a
-                    style={{
-                      color: isDarkMode ? '#ffffff' : '#000000',
-                    }}
-                  >
-                    Next
-                  </a>
-                );
-              }
-              return originalElement;
-            },
           }}
           rowKey="id"
-          style={{
-            backgroundColor: isDarkMode ? '#1f1f1f' : '#ffffff', // Table background
-            color: isDarkMode ? '#ffffff' : '#000000', // Table text color
-          }}
         />
-      }
+      )}
       <Modal
         title="Confirm Delete"
         open={deleteModalVisible}
         onOk={handleDelete}
         onCancel={() => setDeleteModalVisible(false)}
         okText="Delete"
-        okButtonProps={{ danger: true }}
         cancelText="Cancel"
+        okButtonProps={{ danger: true }}
       >
         <p>Are you sure you want to delete this post?</p>
       </Modal>

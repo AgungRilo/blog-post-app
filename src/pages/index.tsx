@@ -55,7 +55,7 @@ export default function Home() {
       return response.status === 200; // Token valid if API call is successful
     } catch (error) {
       setIsValidating(false);
-      return false; // Token invalid
+      return error; // Token invalid
     }
   };
 

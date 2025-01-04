@@ -44,7 +44,6 @@ const PostDetail = () => {
   });
 
   const detail = data || dataDetail; 
-
   if (isLoading) {
     return <DynamicSpin size="large" />;
   }
