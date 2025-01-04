@@ -7,6 +7,3 @@ export const DynamicSwitch = dynamic(() => import('antd/lib/switch'), { ssr: fal
 export const DynamicTable = dynamic(() => import('antd/lib/table'), { ssr: false });
 export const DynamicSpin = dynamic(() => import('antd/lib/spin'), { ssr: false });
 
-export const DynamicInputForm: React.FC<any> = (props) => {
-    return <DynamicInput {...props} />;
-  };
