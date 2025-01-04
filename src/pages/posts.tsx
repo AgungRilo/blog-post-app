@@ -6,7 +6,6 @@ import Header from '@/components/header';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { ColumnType } from 'antd/es/table';
-import { useTheme } from '@/components/themeProvider';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { Modal, Tooltip } from 'antd';
 import { useDispatch } from 'react-redux';

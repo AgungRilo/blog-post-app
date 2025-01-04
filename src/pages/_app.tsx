@@ -1,3 +1,4 @@
+import { AppProps } from 'next/app'; 
 import { useState } from 'react';
 import { ConfigProvider, theme } from 'antd';
 import 'antd/dist/reset.css'; 
@@ -10,7 +11,7 @@ import { store, persistor } from '../store';
 import { ThemeProvider } from '@/components/themeProvider';
 const queryClient = new QueryClient();
 
-export default function App({ Component, pageProps }: any) {
+export default function App({ Component, pageProps }: AppProps) {
   const [isDarkMode] = useState<boolean>(false); 
 
   const antTheme = {
