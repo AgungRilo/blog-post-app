@@ -10,11 +10,16 @@ import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { Modal, Tooltip } from 'antd';
 import { useDispatch } from 'react-redux';
 import { setData } from '@/store/slices/detailSlice';
-import { Post } from '@/components/interface';
+import { Table } from 'antd/lib';
+
+interface Post {
+  id: number;
+  user_id: number; // Pastikan tipe ini konsisten dengan API Anda
+  title: string;
+  body: string;
+}
 
 function Posts() {
-  
-
   const [apiToken, setApiToken] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -45,7 +50,6 @@ function Posts() {
     };
   }, [searchQuery]);
 
-  // Fetch posts dari API
   const fetchPosts = async (): Promise<Post[]> => {
     if (!apiToken) {
       throw new Error('API token not available');
@@ -62,7 +66,6 @@ function Posts() {
 
     const totalPages = parseInt(response.headers['x-pagination-pages'], 10) || 0;
     setTotalPages(totalPages);
-  
     return response.data;
   };
 
@@ -130,7 +133,7 @@ function Posts() {
     {
       title: 'Actions',
       key: 'actions',
-      render: (record: Post) => (
+      render: (_: unknown, record: Post) => (
         <div style={{ display: 'flex', gap: '10px' }}>
           <Tooltip title="View Details">
             <EyeOutlined
@@ -189,7 +192,7 @@ function Posts() {
       {isLoading ? (
         <DynamicSpin size="large" />
       ) : (
-        <DynamicTable
+        <Table<Post>
           dataSource={data || []}
           columns={columns}
           pagination={{
