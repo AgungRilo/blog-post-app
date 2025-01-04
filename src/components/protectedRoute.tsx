@@ -1,10 +1,10 @@
+import React, { ComponentType, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 
-const withAuth = (WrappedComponent: any) => {
-  return (props: any) => {
+const withAuth = <P extends object>(WrappedComponent: ComponentType<P>) => {
+  const HOC = (props: P) => {
     const isAuthenticated = useSelector(
       (state: RootState) => state.auth.isAuthenticated
     );
@@ -12,16 +12,21 @@ const withAuth = (WrappedComponent: any) => {
 
     useEffect(() => {
       if (!isAuthenticated) {
-        router.replace('/'); // Redirect ke login jika belum login
+        router.replace('/'); // Redirect to login if not authenticated
       }
     }, [isAuthenticated, router]);
 
     if (!isAuthenticated) {
-      return null; // Tampilkan loading atau kosong jika belum login
+      return null; // Return nothing or a loader if not authenticated
     }
 
     return <WrappedComponent {...props} />;
   };
+
+  // Set a display name for debugging purposes
+  HOC.displayName = `withAuth(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
+
+  return HOC;
 };
 
 export default withAuth;
